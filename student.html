@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Student Test</title>
+<style>
+table {
+border : 1px solid black;
+border-collapse : collapse; 
+}
+table th,td {
+border : 1px solid black;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src='jsfile?name=abcd.js'></script>
+
+<script>
+function populateTable()
+{
+$("#students>tbody").html('')
+studentService.getAll().then((students)=>{
+students.forEach((student)=>{
+$("#students").find("tbody").append(`<tr><td>${student.rollNumber}</td><td>${student.name}</td><td>${student.gender}</td></tr>`)
+})
+},(error)=>{
+alert(error)
+})
+}
+function getStudent(){
+let rollNumber=$("#getRollNumber").val();
+studentService.get(rollNumber).then((response)=>{
+if(response.success) {
+$("#getName").html(response.student.name);
+$("#getGender").html(response.student.gender);
+return;
+};
+$("#getName").html('');
+$("#getGender").html('');
+alert(response.error);
+},(error)=>{
+$("#getName").html('');
+$("#getGender").html('');
+alert(error);
+})
+}
+function updateStudent(){
+let student=new Student($("#updateRollNumber").val(),$("#updateName").val(),$("#updateGender").val());
+studentService.update(student).then((response)=>{
+if(!response.success){
+alert(response.error)
+return ;
+}
+$("#updateRollNumber").val('')
+$("#updateName").val('')
+$("#updateGender").val('')
+alert("Upated Successfully");
+populateTable();
+},(error)=>{alert(error)})
+}
+function addStudent(){
+let student=new Student($("#addRollNumber").val(),$("#addName").val(),$("#addGender").val());
+studentService.add(student).then((success)=>{
+if(!success) alert("Not added");
+else alert("added")
+$("#addRollNumber").val('')
+$("#addName").val('')
+$("#addGender").val('')
+populateTable();
+},(error)=>{alert(error)})
+}
+function deleteStudent(){
+studentService.delete($("#deleteRollNumber").val()).then((response)=>{
+if(response.success){
+$("#deleteRollNumber").val('')
+alert("Deleted successfully")
+populateTable();
+return;
+}
+alert(response.error);
+},(error)=>{
+alert(error)
+})
+}
+$(()=>{
+populateTable();
+})
+var studentService=new StudentService();
+</script>
+</head>
+<body>
+<h1>List of all students</h1> 
+<button type='button' onClick='populateTable()'>Refresh</button>
+<table id='students'>
+<thead>
+<th>Roll number</th>
+<th>Name</th>
+<th>Gender</th>
+</thead>
+<tbody>
+</tbody>
+</table>
+<br>
+<h1>Add a student</h1> 
+<form>
+Roll number <input type='number' id='addRollNumber'><br>
+Name <input type='text' id='addName'><br>
+Gender <input type='text' id='addGender' maxlength='1'><br>
+<button type='button' onClick='addStudent()'>Add</button>
+</form>
+<br>
+<h1>Get a student</h1> 
+<form>
+Roll number <input type='number' id='getRollNumber'><br>
+Name : <span id='getName'></span><br>
+Gender : <span id='getGender'></span><br>
+<button type='button' onClick='getStudent()'>Get</button>
+</form>
+<br>
+<h1>Update a student</h1> 
+<form>
+Roll number <input type='number' id='updateRollNumber'><br>
+Name <input type='text' id='updateName'><br>
+Gender <input type='text' id='updateGender' maxlength='1'><br>
+<button type='button' onClick='updateStudent()'>Update</button>
+</form>
+<h1>Delete a student</h1> 
+<form>
+Roll number <input type='number' id='deleteRollNumber'><br>
+<button type='button' onClick='deleteStudent()'>Delete</button>
+</form>
+</body>
+</html>
